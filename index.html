@@ -251,7 +251,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('assign-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveAssign()">Save</button>
+      <button class="btn btn-primary" id="assign-save-btn" onclick="saveAssign()">Save</button>
     </div>
   </div>
 </div>
@@ -299,7 +299,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
       <div class="form-grid">
         <div class="form-group full"><label>Full Name</label><input type="text" id="nd-name"></div>
         <div class="form-group"><label>Username</label><input type="text" id="nd-user"></div>
-        <div class="form-group"><label>Password</label><input type="text" id="nd-pass"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="nd-pass"></div>
         <div class="form-group"><label>Role</label>
           <select id="nd-role"><option value="dispatcher">Dispatcher</option><option value="admin">Admin</option></select>
         </div>
@@ -418,7 +418,7 @@ function renderSubmit(){
 function deptOther(){const v=document.getElementById('f-dept').value;const o=document.getElementById('f-dept-other');v==='Other'?o.classList.add('vis'):o.classList.remove('vis');}
 function driverOther(){const v=document.getElementById('m-driver').value;const o=document.getElementById('m-driver-other');v==='Shop / Other'?o.classList.add('vis'):o.classList.remove('vis');}
 function handleFiles(files){Array.from(files).forEach(f=>attachedFiles.push({name:f.name,size:f.size}));renderFileList();}
-function renderFileList(){const el=document.getElementById('file-list');if(!el)return;el.innerHTML=attachedFiles.map((f,i)=>`<div class="file-item"><span>📎 ${f.name}</span><button class="file-remove" onclick="removeFile(${i})">✕</button></div>`).join('');}
+function renderFileList(){const el=document.getElementById('file-list');if(!el)return;el.innerHTML=attachedFiles.map((f,i)=>`<div class="file-item"><span>📎 ${esc(f.name)}</span><button class="file-remove" onclick="removeFile(${i})">✕</button></div>`).join('');}
 function removeFile(i){attachedFiles.splice(i,1);renderFileList();}
 function clearSubmitForm(){['f-job','f-wo','f-fab','f-addr','f-contact','f-weight','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const fd=document.getElementById('f-date');if(fd)fd.value=today();const ft=document.getElementById('f-type');if(ft)ft.value='';attachedFiles=[];renderFileList();}
 
@@ -430,9 +430,12 @@ async function submitRequest(){
   if(!dept){toast('Please select a department.','err');return;}
   if(!date){toast('Please select a delivery date.','err');return;}
   if(!job){toast('Please enter a job name.','err');return;}
+  const btn=document.querySelector('#main-content .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Submitting…';}
   const body={dept,delivery_date:date,job_name:job,wo_number:document.getElementById('f-wo').value.trim(),fab_pro:document.getElementById('f-fab').value.trim(),delivery_type:document.getElementById('f-type').value,address:document.getElementById('f-addr').value.trim(),site_contact:document.getElementById('f-contact').value.trim(),weight_notes:document.getElementById('f-weight').value.trim(),special_notes:document.getElementById('f-notes').value.trim(),attachments:attachedFiles,status:'Pending',submitted_by:user.name};
   try{await post('delivery_requests',body);toast('Request submitted!','ok');clearSubmitForm();if(user.role==='dept')showTab('my-requests');}
   catch(e){toast('Error submitting. Try again.','err');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Submit Request';}}
 }
 
 async function renderMyRequests(){
@@ -440,7 +443,7 @@ async function renderMyRequests(){
   try{rows=await get('delivery_requests',`?dept=eq.${encodeURIComponent(user.dept)}&order=delivery_date.asc`);}
   catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger)">Error loading requests.</p></div>';return;}
   document.getElementById('main-content').innerHTML=`
-  <div class="card"><div class="card-title">My Department Requests — ${user.dept}</div>
+  <div class="card"><div class="card-title">My Department Requests — ${esc(user.dept)}</div>
   <div class="board-toolbar"><span class="filter-lbl">Status:</span>
     <select onchange="filterMyRequests(this.value,'${user.dept}')">
       <option value="">All</option><option>Pending</option><option>Scheduled</option><option>Delivered</option><option>Cancelled</option>
@@ -504,14 +507,14 @@ function boardTableHtml(rows){
   return`<table><thead><tr><th>Date</th><th>Dept</th><th>Job</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Address</th><th>Contact</th><th>Weight</th><th>Status</th><th>Driver</th><th>Truck</th><th>Trailer</th><th>Time</th><th></th></tr></thead>
   <tbody>${rows.map(r=>`<tr class="${isOverdue(r)?'overdue-row':''}">
     <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td>
-    <td class="td-muted">${r.dept}</td><td class="td-job">${r.job_name}</td>
-    <td class="td-muted">${r.wo_number||'—'}</td><td class="td-muted">${r.fab_pro||'—'}</td>
-    <td style="white-space:nowrap;">${r.delivery_type||'—'}</td>
-    <td style="max-width:150px;font-size:12px;">${r.address||'—'}</td>
-    <td>${r.site_contact||'—'}</td><td>${r.weight_notes||'—'}</td>
-    <td>${badgeHtml(r)}</td><td>${r.driver||'<span class="td-muted">—</span>'}</td>
-    <td>${r.truck||'<span class="td-muted">—</span>'}</td>
-    <td>${r.trailer||'<span class="td-muted">—</span>'}</td>
+    <td class="td-muted">${esc(r.dept)}</td><td class="td-job">${esc(r.job_name)}</td>
+    <td class="td-muted">${esc(r.wo_number)||'—'}</td><td class="td-muted">${esc(r.fab_pro)||'—'}</td>
+    <td style="white-space:nowrap;">${esc(r.delivery_type)||'—'}</td>
+    <td style="max-width:150px;font-size:12px;">${esc(r.address)||'—'}</td>
+    <td>${esc(r.site_contact)||'—'}</td><td>${esc(r.weight_notes)||'—'}</td>
+    <td>${badgeHtml(r)}</td><td>${r.driver?esc(r.driver):'<span class="td-muted">—</span>'}</td>
+    <td>${r.truck?esc(r.truck):'<span class="td-muted">—</span>'}</td>
+    <td>${r.trailer?esc(r.trailer):'<span class="td-muted">—</span>'}</td>
     <td>${r.confirmed_time?fmtTime(r.confirmed_time):'<span class="td-muted">TBD</span>'}</td>
     <td style="white-space:nowrap;"><button class="btn btn-primary btn-sm" onclick="openAssign('${r.id}')">Assign</button> <button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button></td>
   </tr>`).join('')}</tbody></table>`;
@@ -542,20 +545,20 @@ async function loadRunSheet(){
   el.innerHTML=Object.entries(byDriver).map(([driverName,runs])=>`
     <div style="margin-bottom:32px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--gun);border-bottom:3px solid var(--yellow);padding-bottom:8px;margin-bottom:16px;text-transform:uppercase;">
-        ${driverName}${runs[0].truck?' — Truck #'+runs[0].truck:''}${runs[0].trailer?' | Trailer #'+runs[0].trailer:''}
+        ${driverName?esc(driverName):'Unassigned'}${runs[0].truck?' — Truck #'+esc(runs[0].truck):''}${runs[0].trailer?' | Trailer #'+esc(runs[0].trailer):''}
         <span style="font-size:14px;font-weight:400;color:var(--muted);margin-left:12px;">${fmtDate(date)}</span>
       </div>
       <div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>Job</th><th>WO / Fab Pro</th><th>Type</th><th>Address</th><th>Contact</th><th>Weight</th><th>Notes</th><th>Attachments</th></tr></thead>
       <tbody>${runs.map((r,i)=>`<tr>
         <td style="font-weight:700;color:var(--yellow-dark);">${i+1}</td>
         <td style="font-weight:700;white-space:nowrap;">${r.confirmed_time?fmtTime(r.confirmed_time):'TBD'}</td>
-        <td class="td-job">${r.job_name}</td>
-        <td class="td-muted">${[r.wo_number,r.fab_pro].filter(Boolean).join(' / ')||'—'}</td>
-        <td>${r.delivery_type||'—'}</td>
-        <td style="font-size:12px;">${r.address||'—'}</td>
-        <td>${r.site_contact||'—'}</td><td>${r.weight_notes||'—'}</td>
-        <td style="font-size:12px;">${[r.special_notes,r.dispatcher_notes].filter(Boolean).join(' | ')||'—'}</td>
-        <td>${r.attachments&&r.attachments.length?r.attachments.map(a=>'📎 '+a.name).join('<br>'):'—'}</td>
+        <td class="td-job">${esc(r.job_name)}</td>
+        <td class="td-muted">${[r.wo_number,r.fab_pro].filter(Boolean).map(esc).join(' / ')||'—'}</td>
+        <td>${esc(r.delivery_type)||'—'}</td>
+        <td style="font-size:12px;">${esc(r.address)||'—'}</td>
+        <td>${esc(r.site_contact)||'—'}</td><td>${esc(r.weight_notes)||'—'}</td>
+        <td style="font-size:12px;">${[r.special_notes,r.dispatcher_notes].filter(Boolean).map(esc).join(' | ')||'—'}</td>
+        <td>${r.attachments&&r.attachments.length?r.attachments.map(a=>'📎 '+esc(a.name)).join('<br>'):'—'}</td>
       </tr>`).join('')}</tbody></table></div></div>`).join('');
 }
 
@@ -564,16 +567,16 @@ async function openAssign(id){
   const rows=await get('delivery_requests',`?id=eq.${id}`);
   const r=rows[0];if(!r)return;
   document.getElementById('assign-detail').innerHTML=`
-    <div class="det-row"><span class="det-lbl">Job</span><span class="det-val" style="font-weight:700;">${r.job_name}</span></div>
-    <div class="det-row"><span class="det-lbl">Dept</span><span class="det-val">${r.dept}</span></div>
+    <div class="det-row"><span class="det-lbl">Job</span><span class="det-val" style="font-weight:700;">${esc(r.job_name)}</span></div>
+    <div class="det-row"><span class="det-lbl">Dept</span><span class="det-val">${esc(r.dept)}</span></div>
     <div class="det-row"><span class="det-lbl">Requested Date</span><span class="det-val">${fmtDate(r.delivery_date)}</span></div>
-    <div class="det-row"><span class="det-lbl">WO / Fab Pro</span><span class="det-val">${[r.wo_number,r.fab_pro].filter(Boolean).join(' / ')||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Type</span><span class="det-val">${r.delivery_type||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Address</span><span class="det-val">${r.address||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Contact</span><span class="det-val">${r.site_contact||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Weight</span><span class="det-val">${r.weight_notes||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Dept Notes</span><span class="det-val">${r.special_notes||'—'}</span></div>
-    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>'📎 '+a.name).join('<br>')}</span></div>`:''}`;
+    <div class="det-row"><span class="det-lbl">WO / Fab Pro</span><span class="det-val">${[r.wo_number,r.fab_pro].filter(Boolean).map(esc).join(' / ')||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Type</span><span class="det-val">${esc(r.delivery_type)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Address</span><span class="det-val">${esc(r.address)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Contact</span><span class="det-val">${esc(r.site_contact)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Weight</span><span class="det-val">${esc(r.weight_notes)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Dept Notes</span><span class="det-val">${esc(r.special_notes)||'—'}</span></div>
+    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>'📎 '+esc(a.name)).join('<br>')}</span></div>`:''}`;
   document.getElementById('m-driver').value=r.driver||'';
   document.getElementById('m-truck').value=r.truck||'';
   document.getElementById('m-trailer').value=r.trailer||'';
@@ -588,9 +591,16 @@ async function openAssign(id){
 async function saveAssign(){
   let driver=document.getElementById('m-driver').value;
   if(driver==='Shop / Other'){const o=document.getElementById('m-driver-other').value.trim();if(o)driver=o;}
-  const body={driver,truck:document.getElementById('m-truck').value.trim(),trailer:document.getElementById('m-trailer').value.trim(),confirmed_time:document.getElementById('m-time').value,status:document.getElementById('m-status').value,dispatcher_notes:document.getElementById('m-notes').value.trim(),delivery_date:document.getElementById('m-date').value,updated_at:new Date().toISOString()};
+  const status=document.getElementById('m-status').value;
+  const delivDate=document.getElementById('m-date').value;
+  if(status==='Scheduled'&&!driver){toast('Please assign a driver before marking Scheduled.','err');return;}
+  if(!delivDate){toast('Please set a delivery date.','err');return;}
+  const btn=document.getElementById('assign-save-btn');
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  const body={driver,truck:document.getElementById('m-truck').value.trim(),trailer:document.getElementById('m-trailer').value.trim(),confirmed_time:document.getElementById('m-time').value,status,dispatcher_notes:document.getElementById('m-notes').value.trim(),delivery_date:delivDate,updated_at:new Date().toISOString()};
   try{await patch('delivery_requests',body,`?id=eq.${editingId}`);closeModal('assign-modal');toast('Assignment saved!','ok');renderBoard();}
   catch(e){toast('Error saving. Try again.','err');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Save Assignment';}}
 }
 
 async function viewRequest(id){
@@ -599,23 +609,23 @@ async function viewRequest(id){
   const r=rows[0];if(!r)return;
   document.getElementById('view-modal-body').innerHTML=`
     <div class="det-row"><span class="det-lbl">Status</span><span class="det-val">${badgeHtml(r)}</span></div>
-    <div class="det-row"><span class="det-lbl">Department</span><span class="det-val">${r.dept}</span></div>
-    <div class="det-row"><span class="det-lbl">Job Name</span><span class="det-val" style="font-weight:700;">${r.job_name}</span></div>
-    <div class="det-row"><span class="det-lbl">WO Number</span><span class="det-val">${r.wo_number||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Fab Pro Number</span><span class="det-val">${r.fab_pro||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Delivery Type</span><span class="det-val">${r.delivery_type||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Department</span><span class="det-val">${esc(r.dept)}</span></div>
+    <div class="det-row"><span class="det-lbl">Job Name</span><span class="det-val" style="font-weight:700;">${esc(r.job_name)}</span></div>
+    <div class="det-row"><span class="det-lbl">WO Number</span><span class="det-val">${esc(r.wo_number)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Fab Pro Number</span><span class="det-val">${esc(r.fab_pro)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Delivery Type</span><span class="det-val">${esc(r.delivery_type)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Requested Date</span><span class="det-val">${fmtDate(r.delivery_date)}</span></div>
-    <div class="det-row"><span class="det-lbl">Address</span><span class="det-val">${r.address||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Site Contact</span><span class="det-val">${r.site_contact||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Weight / Load</span><span class="det-val">${r.weight_notes||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Notes</span><span class="det-val">${r.special_notes||'—'}</span></div>
-    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>'📎 '+a.name).join('<br>')}</span></div>`:''}
+    <div class="det-row"><span class="det-lbl">Address</span><span class="det-val">${esc(r.address)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Site Contact</span><span class="det-val">${esc(r.site_contact)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Weight / Load</span><span class="det-val">${esc(r.weight_notes)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Notes</span><span class="det-val">${esc(r.special_notes)||'—'}</span></div>
+    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>'📎 '+esc(a.name)).join('<br>')}</span></div>`:''}
     <hr style="margin:16px 0;border:none;border-top:1px solid var(--silver);">
-    <div class="det-row"><span class="det-lbl">Driver</span><span class="det-val">${r.driver||'Unassigned'}</span></div>
-    <div class="det-row"><span class="det-lbl">Truck #</span><span class="det-val">${r.truck||'—'}</span></div>
-    <div class="det-row"><span class="det-lbl">Trailer #</span><span class="det-val">${r.trailer||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Driver</span><span class="det-val">${esc(r.driver)||'Unassigned'}</span></div>
+    <div class="det-row"><span class="det-lbl">Truck #</span><span class="det-val">${esc(r.truck)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Trailer #</span><span class="det-val">${esc(r.trailer)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Confirmed Time</span><span class="det-val">${r.confirmed_time?fmtTime(r.confirmed_time):'TBD'}</span></div>
-    ${(user.role==='dispatcher'||user.role==='admin')&&r.dispatcher_notes?`<div class="det-row"><span class="det-lbl">Dispatcher Notes</span><span class="det-val">${r.dispatcher_notes}</span></div>`:''}
+    ${(user.role==='dispatcher'||user.role==='admin')&&r.dispatcher_notes?`<div class="det-row"><span class="det-lbl">Dispatcher Notes</span><span class="det-val">${esc(r.dispatcher_notes)}</span></div>`:''}
     <div class="det-row"><span class="det-lbl">Submitted</span><span class="det-val">${new Date(r.submitted_at).toLocaleString()}</span></div>`;
   const eb=document.getElementById('view-edit-btn');
   eb.style.display=(r.status==='Pending'&&user.role==='dept')?'inline-block':'none';
@@ -639,9 +649,15 @@ async function openEditModal(id){
   document.getElementById('edit-modal').classList.add('open');
 }
 async function saveEdit(){
-  const body={delivery_date:document.getElementById('e-date').value,delivery_type:document.getElementById('e-type').value,job_name:document.getElementById('e-job').value.trim(),wo_number:document.getElementById('e-wo').value.trim(),fab_pro:document.getElementById('e-fab').value.trim(),address:document.getElementById('e-addr').value.trim(),site_contact:document.getElementById('e-contact').value.trim(),weight_notes:document.getElementById('e-weight').value.trim(),special_notes:document.getElementById('e-notes').value.trim(),updated_at:new Date().toISOString()};
+  const job=document.getElementById('e-job').value.trim();
+  const date=document.getElementById('e-date').value;
+  if(!job){toast('Job name cannot be empty.','err');return;}
+  if(!date){toast('Delivery date cannot be empty.','err');return;}
+  const body={delivery_date:date,delivery_type:document.getElementById('e-type').value,job_name:job,wo_number:document.getElementById('e-wo').value.trim(),fab_pro:document.getElementById('e-fab').value.trim(),address:document.getElementById('e-addr').value.trim(),site_contact:document.getElementById('e-contact').value.trim(),weight_notes:document.getElementById('e-weight').value.trim(),special_notes:document.getElementById('e-notes').value.trim(),updated_at:new Date().toISOString()};
+  const btn=document.querySelector('#edit-modal .btn-primary');if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{await patch('delivery_requests',body,`?id=eq.${editingId}`);closeModal('edit-modal');toast('Request updated!','ok');renderMyRequests();}
   catch(e){toast('Error saving.','err');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Save Changes';}}
 }
 function editRequest(id){openEditModal(id);}
 
@@ -678,6 +694,7 @@ async function loadReports(){
   const to=document.getElementById('rp-to').value;
   const type=document.getElementById('rp-type')?document.getElementById('rp-type').value:'summary';
   if(!from||!to){toast('Set both dates.','err');return;}
+  if(from>to){toast('Start date must be before end date.','err');return;}
   reportData=await get('delivery_requests',`?delivery_date=gte.${from}&delivery_date=lte.${to}&order=delivery_date.asc`);
   const rows=reportData;
   const el=document.getElementById('rp-content');
@@ -703,11 +720,11 @@ async function loadReports(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
       <div><div class="card-title" style="font-size:14px;margin-bottom:12px;">By Driver</div>
         <table><thead><tr><th>Driver</th><th>Stops</th></tr></thead>
-        <tbody>${Object.entries(byDriver).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`<tr><td>${d}</td><td style="font-weight:700;">${n}</td></tr>`).join('')}</tbody></table>
+        <tbody>${Object.entries(byDriver).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`<tr><td>${esc(d)}</td><td style="font-weight:700;">${n}</td></tr>`).join('')}</tbody></table>
       </div>
       <div><div class="card-title" style="font-size:14px;margin-bottom:12px;">By Department</div>
         <table><thead><tr><th>Department</th><th>Requests</th></tr></thead>
-        <tbody>${Object.entries(byDept).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`<tr><td>${d}</td><td style="font-weight:700;">${n}</td></tr>`).join('')}</tbody></table>
+        <tbody>${Object.entries(byDept).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`<tr><td>${esc(d)}</td><td style="font-weight:700;">${n}</td></tr>`).join('')}</tbody></table>
       </div>
     </div>`;
 
@@ -716,9 +733,9 @@ async function loadReports(){
     rows.forEach(r=>{const d=r.driver||'Unassigned';if(!byDriver[d])byDriver[d]=[];byDriver[d].push(r);});
     el.innerHTML=statsHtml+Object.entries(byDriver).sort((a,b)=>b[1].length-a[1].length).map(([driver,jobs])=>`
       <div style="margin-bottom:24px;">
-        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🚚 ${driver} — ${jobs.length} stop${jobs.length!==1?'s':''}</div>
+        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🚚 ${esc(driver)} — ${jobs.length} stop${jobs.length!==1?'s':''}</div>
         <div class="table-wrap"><table><thead><tr><th>Date</th><th>Job</th><th>Dept</th><th>Type</th><th>Truck</th><th>Trailer</th><th>Status</th></tr></thead>
-        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${r.job_name}</td><td class="td-muted">${r.dept}</td><td>${r.delivery_type||'—'}</td><td>${r.truck||'—'}</td><td>${r.trailer||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
+        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${esc(r.job_name)}</td><td class="td-muted">${esc(r.dept)}</td><td>${esc(r.delivery_type)||'—'}</td><td>${esc(r.truck)||'—'}</td><td>${esc(r.trailer)||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
       </div>`).join('');
 
   } else if(type==='truck'){
@@ -726,9 +743,9 @@ async function loadReports(){
     rows.forEach(r=>{const t=r.truck||'No Truck Assigned';if(!byTruck[t])byTruck[t]=[];byTruck[t].push(r);});
     el.innerHTML=statsHtml+Object.entries(byTruck).sort((a,b)=>b[1].length-a[1].length).map(([truck,jobs])=>`
       <div style="margin-bottom:24px;">
-        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🚛 Truck #${truck} — ${jobs.length} run${jobs.length!==1?'s':''}</div>
+        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🚛 Truck #${esc(truck)} — ${jobs.length} run${jobs.length!==1?'s':''}</div>
         <div class="table-wrap"><table><thead><tr><th>Date</th><th>Driver</th><th>Job</th><th>Dept</th><th>Type</th><th>Status</th></tr></thead>
-        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td>${r.driver||'—'}</td><td class="td-job">${r.job_name}</td><td class="td-muted">${r.dept}</td><td>${r.delivery_type||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
+        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td>${esc(r.driver)||'—'}</td><td class="td-job">${esc(r.job_name)}</td><td class="td-muted">${esc(r.dept)}</td><td>${esc(r.delivery_type)||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
       </div>`).join('');
 
   } else if(type==='trailer'){
@@ -736,9 +753,9 @@ async function loadReports(){
     rows.forEach(r=>{const t=r.trailer||'No Trailer Assigned';if(!byTrailer[t])byTrailer[t]=[];byTrailer[t].push(r);});
     el.innerHTML=statsHtml+Object.entries(byTrailer).sort((a,b)=>b[1].length-a[1].length).map(([trailer,jobs])=>`
       <div style="margin-bottom:24px;">
-        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🔗 Trailer #${trailer} — ${jobs.length} run${jobs.length!==1?'s':''}</div>
+        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🔗 Trailer #${esc(trailer)} — ${jobs.length} run${jobs.length!==1?'s':''}</div>
         <div class="table-wrap"><table><thead><tr><th>Date</th><th>Driver</th><th>Truck</th><th>Job</th><th>Dept</th><th>Status</th></tr></thead>
-        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td>${r.driver||'—'}</td><td>${r.truck||'—'}</td><td class="td-job">${r.job_name}</td><td class="td-muted">${r.dept}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
+        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td>${esc(r.driver)||'—'}</td><td>${esc(r.truck)||'—'}</td><td class="td-job">${esc(r.job_name)}</td><td class="td-muted">${esc(r.dept)}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
       </div>`).join('');
 
   } else if(type==='dept'){
@@ -746,9 +763,9 @@ async function loadReports(){
     rows.forEach(r=>{if(!byDept[r.dept])byDept[r.dept]=[];byDept[r.dept].push(r);});
     el.innerHTML=statsHtml+Object.entries(byDept).sort((a,b)=>b[1].length-a[1].length).map(([dept,jobs])=>`
       <div style="margin-bottom:24px;">
-        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🏢 ${dept} — ${jobs.length} request${jobs.length!==1?'s':''}</div>
+        <div class="card-title" style="font-size:15px;margin-bottom:10px;">🏢 ${esc(dept)} — ${jobs.length} request${jobs.length!==1?'s':''}</div>
         <div class="table-wrap"><table><thead><tr><th>Date</th><th>Job</th><th>Type</th><th>Driver</th><th>Status</th></tr></thead>
-        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${r.job_name}</td><td>${r.delivery_type||'—'}</td><td>${r.driver||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
+        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${esc(r.job_name)}</td><td>${esc(r.delivery_type)||'—'}</td><td>${esc(r.driver)||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
       </div>`).join('');
 
   } else if(type==='type'){
@@ -756,21 +773,19 @@ async function loadReports(){
     rows.forEach(r=>{const t=r.delivery_type||'Unspecified';if(!byType[t])byType[t]=[];byType[t].push(r);});
     el.innerHTML=statsHtml+Object.entries(byType).sort((a,b)=>b[1].length-a[1].length).map(([dtype,jobs])=>`
       <div style="margin-bottom:24px;">
-        <div class="card-title" style="font-size:15px;margin-bottom:10px;">📦 ${dtype} — ${jobs.length} job${jobs.length!==1?'s':''}</div>
+        <div class="card-title" style="font-size:15px;margin-bottom:10px;">📦 ${esc(dtype)} — ${jobs.length} job${jobs.length!==1?'s':''}</div>
         <div class="table-wrap"><table><thead><tr><th>Date</th><th>Job</th><th>Dept</th><th>Driver</th><th>Status</th></tr></thead>
-        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${r.job_name}</td><td class="td-muted">${r.dept}</td><td>${r.driver||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
+        <tbody>${jobs.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${esc(r.job_name)}</td><td class="td-muted">${esc(r.dept)}</td><td>${esc(r.driver)||'—'}</td><td>${badgeHtml(r)}</td></tr>`).join('')}</tbody></table></div>
       </div>`).join('');
 
   } else if(type==='rescheduled'){
-    // Jobs where updated_at date differs from submitted_at date and delivery_date changed
     const rescheduled=rows.filter(r=>r.updated_at&&r.submitted_at&&new Date(r.updated_at).toDateString()!==new Date(r.submitted_at).toDateString());
     el.innerHTML=statsHtml+`
     <div class="card-title" style="font-size:15px;margin-bottom:12px;">📅 Rescheduled Jobs — ${rescheduled.length} found</div>
     <div class="table-wrap"><table><thead><tr><th>Delivery Date</th><th>Job</th><th>Dept</th><th>Driver</th><th>Submitted</th><th>Last Updated</th><th>Status</th></tr></thead>
-    <tbody>${rescheduled.length?rescheduled.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${r.job_name}</td><td class="td-muted">${r.dept}</td><td>${r.driver||'—'}</td><td class="td-muted">${new Date(r.submitted_at).toLocaleDateString()}</td><td class="td-muted">${new Date(r.updated_at).toLocaleDateString()}</td><td>${badgeHtml(r)}</td></tr>`).join(''):'<tr><td colspan="7" style="color:var(--muted);text-align:center;">No rescheduled jobs found</td></tr>'}</tbody></table></div>`;
+    <tbody>${rescheduled.length?rescheduled.map(r=>`<tr><td>${fmtDate(r.delivery_date)}</td><td class="td-job">${esc(r.job_name)}</td><td class="td-muted">${esc(r.dept)}</td><td>${esc(r.driver)||'—'}</td><td class="td-muted">${new Date(r.submitted_at).toLocaleDateString()}</td><td class="td-muted">${new Date(r.updated_at).toLocaleDateString()}</td><td>${badgeHtml(r)}</td></tr>`).join(''):'<tr><td colspan="7" style="color:var(--muted);text-align:center;">No rescheduled jobs found</td></tr>'}</tbody></table></div>`;
 
   } else if(type==='workload'){
-    // Group by driver and count by week
     const byDriver={};
     rows.forEach(r=>{
       const d=r.driver||'Unassigned';
@@ -784,7 +799,7 @@ async function loadReports(){
     <div class="table-wrap"><table><thead><tr><th>Driver</th>${weeks.map(w=>`<th>Wk ${w}</th>`).join('')}<th>Total</th></tr></thead>
     <tbody>${Object.entries(byDriver).sort((a,b)=>Object.values(b[1]).reduce((s,n)=>s+n,0)-Object.values(a[1]).reduce((s,n)=>s+n,0)).map(([driver,wks])=>{
       const total=Object.values(wks).reduce((s,n)=>s+n,0);
-      return`<tr><td style="font-weight:600;">${driver}</td>${weeks.map(w=>`<td style="text-align:center;">${wks[w]||'—'}</td>`).join('')}<td style="font-weight:700;color:var(--gun);">${total}</td></tr>`;
+      return`<tr><td style="font-weight:600;">${esc(driver)}</td>${weeks.map(w=>`<td style="text-align:center;">${wks[w]||'—'}</td>`).join('')}<td style="font-weight:700;color:var(--gun);">${total}</td></tr>`;
     }).join('')}</tbody></table></div>`;
 
   } else {
@@ -802,7 +817,8 @@ function getWeek(dateStr){
 function exportCSV(){
   if(!reportData.length){toast('Run a report first.','err');return;}
   const cols=['delivery_date','dept','job_name','wo_number','fab_pro','delivery_type','address','site_contact','weight_notes','status','driver','truck','trailer','confirmed_time','special_notes','dispatcher_notes','submitted_by','submitted_at'];
-  const csv=[cols.join(','),...reportData.map(r=>cols.map(c=>`"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  const sanitize=v=>{const s=(v||'').toString().replace(/"/g,'""');return /^[=+\-@\t\r]/.test(s)?`"'${s}"`:`"${s}"`;};  
+  const csv=[cols.join(','),...reportData.map(r=>cols.map(c=>sanitize(r[c])).join(','))].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`tcb_dispatch_report_${today()}.csv`;a.click();
 }
 
@@ -814,8 +830,8 @@ async function renderAdmin(){
   <div class="table-wrap"><table>
     <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Active</th><th></th></tr></thead>
     <tbody>${dispatchers.map(d=>`<tr>
-      <td style="font-weight:600;">${d.full_name}</td><td class="td-muted">${d.username}</td>
-      <td><span class="badge ${d.role==='admin'?'b-scheduled':'b-pending'}">${d.role}</span></td>
+      <td style="font-weight:600;">${esc(d.full_name)}</td><td class="td-muted">${esc(d.username)}</td>
+      <td><span class="badge ${d.role==='admin'?'b-scheduled':'b-pending'}">${esc(d.role)}</span></td>
       <td>${d.active?'✅':'❌'}</td>
       <td><button class="btn btn-secondary btn-sm" onclick="toggleDispatcher('${d.id}',${d.active})">${d.active?'Deactivate':'Activate'}</button></td>
     </tr>`).join('')}</tbody></table></div></div>`;
@@ -837,10 +853,10 @@ function tableHtml(rows,isBoard=false){
   if(!rows.length)return'<p style="color:var(--muted);padding:20px 0;">No records found.</p>';
   return`<div class="table-wrap"><table><thead><tr><th>Date</th><th>Job</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Status</th><th>Driver</th><th>Time</th><th></th></tr></thead>
   <tbody>${rows.map(r=>`<tr class="${isOverdue(r)?'overdue-row':''}">
-    <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td><td class="td-job">${r.job_name}</td>
-    <td class="td-muted">${r.wo_number||'—'}</td><td class="td-muted">${r.fab_pro||'—'}</td>
-    <td>${r.delivery_type||'—'}</td><td>${badgeHtml(r)}</td>
-    <td>${r.driver||'<span class="td-muted">Unassigned</span>'}</td>
+    <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td><td class="td-job">${esc(r.job_name)}</td>
+    <td class="td-muted">${esc(r.wo_number)||'—'}</td><td class="td-muted">${esc(r.fab_pro)||'—'}</td>
+    <td>${esc(r.delivery_type)||'—'}</td><td>${badgeHtml(r)}</td>
+    <td>${r.driver?esc(r.driver):'<span class="td-muted">Unassigned</span>'}</td>
     <td>${r.confirmed_time?fmtTime(r.confirmed_time):'<span class="td-muted">TBD</span>'}</td>
     <td style="white-space:nowrap;">
       <button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button>
@@ -859,8 +875,9 @@ function badgeHtml(r){
 }
 function today(){return new Date().toISOString().split('T')[0];}
 function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${m}/${d}/${y}`;}
-function fmtTime(t){if(!t)return'';const[h,min]=t.split(':');const hr=parseInt(h);return`${hr>12?hr-12:hr||12}:${min} ${hr>=12?'PM':'AM'}`;}
+function fmtTime(t){if(!t)return'';const[h,min]=t.split(':');const hr=parseInt(h);const disp=hr===0?12:hr>12?hr-12:hr;return`${disp}:${min} ${hr>=12?'PM':'AM'}`;}
 function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;setTimeout(()=>t.className='toast',3000);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 </script>
 </body>
 </html>
