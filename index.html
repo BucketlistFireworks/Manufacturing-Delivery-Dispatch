@@ -232,7 +232,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
 <!-- MODALS -->
 <div class="modal-overlay" id="assign-modal">
   <div class="modal">
-    <div class="modal-hdr"><h3>Assign Delivery</h3><button class="modal-close" onclick="closeModal('assign-modal')">✕</button></div>
+    <div class="modal-hdr"><h3>Assign Delivery</h3><button class="modal-close" aria-label="Close" onclick="closeModal('assign-modal')">✕</button></div>
     <div class="modal-body">
       <div id="assign-detail" style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--silver);"></div>
       <div class="form-grid">
@@ -271,7 +271,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
 
 <div class="modal-overlay" id="view-modal">
   <div class="modal">
-    <div class="modal-hdr"><h3>Delivery Detail</h3><button class="modal-close" onclick="closeModal('view-modal')">✕</button></div>
+    <div class="modal-hdr"><h3>Delivery Detail</h3><button class="modal-close" aria-label="Close" onclick="closeModal('view-modal')">✕</button></div>
     <div class="modal-body" id="view-modal-body"></div>
     <div id="field-upload-section" style="display:none;padding:16px 0 0;border-top:1px solid var(--silver);margin-top:16px;">
       <div class="form-group">
@@ -293,7 +293,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
 
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
-    <div class="modal-hdr"><h3>Edit Delivery Request</h3><button class="modal-close" onclick="closeModal('edit-modal')">✕</button></div>
+    <div class="modal-hdr"><h3>Edit Delivery Request</h3><button class="modal-close" aria-label="Close" onclick="closeModal('edit-modal')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group"><label>Delivery Date</label><input type="date" id="e-date"></div>
@@ -318,7 +318,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
 
 <div class="modal-overlay" id="add-disp-modal">
   <div class="modal">
-    <div class="modal-hdr"><h3>Add Dispatcher Account</h3><button class="modal-close" onclick="closeModal('add-disp-modal')">✕</button></div>
+    <div class="modal-hdr"><h3>Add Dispatcher Account</h3><button class="modal-close" aria-label="Close" onclick="closeModal('add-disp-modal')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group full"><label>Full Name</label><input type="text" id="nd-name"></div>
@@ -336,6 +336,103 @@ tbody td { padding:9px 12px; vertical-align:middle; }
   </div>
 </div>
 
+<!-- PHONE-IN / WALK-IN REQUEST MODAL -->
+<div class="modal-overlay" id="phonein-modal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-hdr"><h3>📞 Phone-In / Walk-In Request</h3><button class="modal-close" aria-label="Close" onclick="closeModal('phonein-modal')">✕</button></div>
+    <div class="modal-body">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Enter a request on behalf of a department. You can assign a driver and schedule it immediately in one step.</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Department *</label>
+          <select id="pi-dept">
+            <option value="">Select department…</option>
+            <option>Warehouse</option><option>Sheet Metal</option><option>Piping &amp; Plumbing</option>
+            <option>Tool Room</option><option>Home Service</option><option>FM2</option>
+            <option>Large Construction</option><option>Special Projects</option>
+            <option>Facility Solutions</option><option>Smart Buildings</option>
+            <option>Electrical</option><option>Plumbing</option><option>Home Generators</option>
+            <option>Purchasing</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Delivery Date *</label>
+          <input type="date" id="pi-date">
+        </div>
+        <div class="form-group">
+          <label>Job Name *</label>
+          <input type="text" id="pi-job" placeholder="e.g. Hendersonville Hospital">
+        </div>
+        <div class="form-group">
+          <label>WO / Job Number</label>
+          <input type="text" id="pi-wo" placeholder="e.g. 2024-01-0786">
+        </div>
+        <div class="form-group">
+          <label>Fab Pro Number</label>
+          <input type="text" id="pi-fab" placeholder="e.g. FP#29197">
+        </div>
+        <div class="form-group">
+          <label>Delivery Type</label>
+          <select id="pi-type"><option value="">Select…</option><option>Deliver</option><option>Pick Up (P/U)</option><option>Customer Will Receive (CWR)</option><option>On-Site</option><option>Warehouse Return</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Delivery Address</label>
+          <input type="text" id="pi-addr" placeholder="Full address">
+        </div>
+        <div class="form-group">
+          <label>Site Contact</label>
+          <input type="text" id="pi-contact" placeholder="Name on site">
+        </div>
+        <div class="form-group">
+          <label>Weight / Load Notes</label>
+          <input type="text" id="pi-weight" placeholder="e.g. 3 pallets, ~800 lbs">
+        </div>
+        <div class="form-group full">
+          <label>Special Notes</label>
+          <input type="text" id="pi-notes" placeholder="Any notes for driver or field">
+        </div>
+      </div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--silver);">
+      <p style="font-weight:600;font-size:14px;margin-bottom:14px;color:var(--gun);">Assign Now (optional — leave blank to save as Pending)</p>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="form-group">
+          <label>Driver</label>
+          <select id="pi-driver" onchange="piDriverOther()">
+            <option value="">Unassigned</option>
+            <option>Bob Johnson</option><option>Brandon Jones</option><option>Michael Gropp</option>
+            <option>Ron Gibson</option><option>Ray Swimm</option><option>John Foster</option><option>Andy Davis</option>
+            <option value="Other">Other / Hot Shot</option>
+          </select>
+          <input type="text" class="other-input" id="pi-driver-other" placeholder="Enter driver name…">
+        </div>
+        <div class="form-group">
+          <label>Truck Number</label>
+          <input type="text" id="pi-truck" placeholder="e.g. LEE-1825">
+        </div>
+        <div class="form-group">
+          <label>Trailer Number</label>
+          <input type="text" id="pi-trailer" placeholder="e.g. T-16">
+        </div>
+        <div class="form-group">
+          <label>Confirmed Time</label>
+          <input type="time" id="pi-time">
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+          <input type="checkbox" id="pi-urgent" style="width:18px;height:18px;cursor:pointer;accent-color:#b91c1c;">
+          <span style="color:#b91c1c;font-weight:700;">🔴 Mark as URGENT</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('phonein-modal')">Cancel</button>
+      <button class="btn btn-secondary" id="pi-save-pending" onclick="savePhoneIn(false)">Save as Pending</button>
+      <button class="btn btn-primary" id="pi-save-scheduled" onclick="savePhoneIn(true)">Save &amp; Schedule</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -345,15 +442,55 @@ const SB_SERVICE='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const BUCKET='TCB Logistics Storage';
 
 async function sb(method,table,body,params=''){
-  const res=await fetch(`${SB_URL}/rest/v1/${table}${params}`,{method,headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:body?JSON.stringify(body):undefined});
-  if(!res.ok){const e=await res.text();throw new Error(e);}
-  const t=await res.text();return t?JSON.parse(t):[];
+  if(!navigator.onLine){showOfflineBanner();throw new Error('No internet connection');}
+  try{
+    const res=await fetch(`${SB_URL}/rest/v1/${table}${params}`,{method,headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:body?JSON.stringify(body):undefined});
+    if(!res.ok){const e=await res.text();throw new Error(e);}
+    const t=await res.text();return t?JSON.parse(t):[];
+  }catch(e){
+    if(e.message==='Failed to fetch'||e.message.includes('NetworkError')||e.message.includes('network')){showOfflineBanner();throw new Error('Network error');}
+    throw e;
+  }
 }
 const get=(table,params='')=>sb('GET',table,null,params);
 const post=(table,body)=>sb('POST',table,body);
 const patch=(table,body,params)=>sb('PATCH',table,body,params);
 
-let user=null,editingId=null,viewingId=null,attachedFiles=[];
+// ─── OFFLINE DETECTION ─────────────────────────────────────────────
+function showOfflineBanner(){
+  let b=document.getElementById('offline-banner');
+  if(!b){b=document.createElement('div');b.id='offline-banner';b.style.cssText='position:fixed;top:0;left:0;right:0;background:#b91c1c;color:white;text-align:center;padding:10px;font-size:14px;font-weight:600;z-index:9999;';b.textContent='⚠️ No internet connection — please check your network and try again.';document.body.prepend(b);}
+}
+function hideOfflineBanner(){const b=document.getElementById('offline-banner');if(b)b.remove();}
+window.addEventListener('online',()=>{hideOfflineBanner();toast('Connection restored.','ok');});
+window.addEventListener('offline',()=>showOfflineBanner());
+
+// ─── SESSION TIMEOUT (4 hours) ─────────────────────────────────────
+let sessionTimer=null;
+function resetSessionTimer(){
+  clearTimeout(sessionTimer);
+  sessionTimer=setTimeout(()=>{
+    if(user){toast('Session expired — please log in again.','err');setTimeout(logout,2000);}
+  },4*60*60*1000);
+}
+document.addEventListener('click',resetSessionTimer);
+document.addEventListener('keydown',resetSessionTimer);
+
+// ─── AUTO REFRESH for dept My Requests (60s) ───────────────────────
+let autoRefreshTimer=null;
+function startAutoRefresh(fn){
+  stopAutoRefresh();
+  autoRefreshTimer=setInterval(()=>{
+    if(!user)return;
+    // Don't refresh if any modal is open — would disrupt dispatcher mid-entry
+    const anyModalOpen=document.querySelector('.modal-overlay.open');
+    if(anyModalOpen)return;
+    fn();
+  },60000);
+}
+function stopAutoRefresh(){clearInterval(autoRefreshTimer);}
+
+let user=null,editingId=null,viewingId=null,attachedFiles=[],assignOpenedAt=null,isSubmitting=false;
 
 function showDispPanel(){document.getElementById('dept-panel').style.display='none';document.getElementById('disp-panel').classList.add('open');document.getElementById('login-user').focus();}
 function showDeptPanel(){document.getElementById('dept-panel').style.display='block';document.getElementById('disp-panel').classList.remove('open');}
@@ -380,7 +517,16 @@ function enterApp(){
   document.getElementById('user-badge').textContent=user.name;
   buildNav();
 }
-function logout(){user=null;attachedFiles=[];document.getElementById('login-screen').style.display='flex';document.getElementById('app').classList.add('app-hidden');document.getElementById('login-user').value='';document.getElementById('login-pass').value='';showDeptPanel();}
+function logout(){
+  stopAutoRefresh();
+  clearTimeout(sessionTimer);
+  user=null;attachedFiles=[];
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').classList.add('app-hidden');
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+  showDeptPanel();
+}
 
 function buildNav(){
   const nav=document.getElementById('nav-tabs');
@@ -397,7 +543,17 @@ function buildNav(){
   showTab(tabs[0].id);
 }
 
+function isFormDirty(){
+  const fields=['f-job','f-wo','f-fab','f-addr','f-contact','f-weight','f-notes'];
+  return fields.some(id=>{const el=document.getElementById(id);return el&&el.value.trim();}) || attachedFiles.length>0;
+}
+
 function showTab(tab){
+  // Warn if navigating away from a dirty submit form
+  if(tab!=='submit'&&document.getElementById('f-job')&&isFormDirty()){
+    if(!confirm('You have an unsaved request. Leave without submitting?'))return;
+  }
+  stopAutoRefresh();
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   const el=document.getElementById('tab-'+tab);if(el)el.classList.add('active');
   const main=document.getElementById('main-content');
@@ -422,17 +578,26 @@ function renderSubmit(){
       </select>
       <input type="text" id="f-dept-other" class="show-other ${!['Warehouse','Sheet Metal','Piping & Plumbing','Tool Room',''].includes(dv)?'vis':''}" placeholder="Department name" value="${!['Warehouse','Sheet Metal','Piping & Plumbing','Tool Room',''].includes(dv)?dv:''}">
     </div>
-    <div class="form-group"><label>Requested Delivery Date</label><input type="date" id="f-date" value="${today()}"></div>
-    <div class="form-group"><label>Job Name</label><input type="text" id="f-job" placeholder="e.g. Hendersonville Hospital"></div>
-    <div class="form-group"><label>Job / WO Number</label><input type="text" id="f-wo" placeholder="e.g. 2024-01-0786"></div>
-    <div class="form-group"><label>Fab Pro Number</label><input type="text" id="f-fab" placeholder="e.g. FP#29197"></div>
-    <div class="form-group"><label>Delivery Type</label>
-      <select id="f-type"><option value="">Select...</option><option>Deliver</option><option>Pick Up (P/U)</option><option>Customer Will Receive (CWR)</option><option>On-Site</option><option>Warehouse Return</option></select>
+    <div class="form-group"><label>Requested Delivery Date</label><input type="date" id="f-date" value="${today()}" onchange="checkDeliveryDate(this.value)">
+      <div id="date-warning" style="display:none;margin-top:6px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:600;"></div>
     </div>
-    <div class="form-group full"><label>Delivery Address</label><input type="text" id="f-addr" placeholder="Full street address, city, state, zip"></div>
-    <div class="form-group"><label>Site Contact Name</label><input type="text" id="f-contact" placeholder="e.g. Brad Parker"></div>
-    <div class="form-group"><label>Weight / Load Notes</label><input type="text" id="f-weight" placeholder="e.g. 144.8 lbs, 3 pallets"></div>
+    <div class="form-group"><label>Job Name</label><input type="text" id="f-job" maxlength="120" placeholder="e.g. Hendersonville Hospital"></div>
+    <div class="form-group"><label>Job / WO Number</label><input type="text" id="f-wo" maxlength="60" placeholder="e.g. 2024-01-0786"></div>
+    <div class="form-group"><label>Fab Pro Number</label><input type="text" id="f-fab" maxlength="60" placeholder="e.g. FP#29197"></div>
+    <div class="form-group"><label>Delivery Type</label>
+      <select id="f-type" onchange="checkAddressWarning()"><option value="">Select...</option><option>Deliver</option><option>Pick Up (P/U)</option><option>Customer Will Receive (CWR)</option><option>On-Site</option><option>Warehouse Return</option></select>
+    </div>
+    <div class="form-group full"><label>Delivery Address</label><input type="text" id="f-addr" maxlength="200" placeholder="Full street address, city, state, zip"></div>
+    <div class="form-group"><label>Site Contact Name</label><input type="text" id="f-contact" maxlength="80" placeholder="e.g. Brad Parker"></div>
+    <div class="form-group"><label>Weight / Load Notes</label><input type="text" id="f-weight" maxlength="100" placeholder="e.g. 144.8 lbs, 3 pallets"></div>
     <div class="form-group full"><label>Special Notes</label><textarea id="f-notes" placeholder="Any details for the dispatcher or driver..."></textarea></div>
+    <div class="form-group" style="padding-top:4px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+        <input type="checkbox" id="f-urgent" style="width:18px;height:18px;cursor:pointer;accent-color:#b91c1c;">
+        <span style="color:#b91c1c;font-weight:700;">🔴 Mark as URGENT</span>
+      </label>
+      <span style="font-size:11px;color:var(--muted);">Flags this job on the dispatch board</span>
+    </div>
     <div class="form-group full"><label>Attachments (PDF, images)</label>
       <div class="file-drop" id="drop-zone" onclick="document.getElementById('f-files').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');handleFiles(event.dataTransfer.files)">
         <input type="file" id="f-files" multiple accept=".pdf,.png,.jpg,.jpeg" onchange="handleFiles(this.files)">
@@ -442,7 +607,7 @@ function renderSubmit(){
     </div>
   </div>
   <div style="margin-top:20px;display:flex;gap:10px;">
-    <button class="btn btn-primary" onclick="submitRequest()">Submit Request</button>
+    <button class="btn btn-primary" id="submit-request-btn" onclick="submitRequest()">Submit Request</button>
     <button class="btn btn-secondary" onclick="clearSubmitForm()">Clear</button>
   </div></div>`;
   attachedFiles=[];
@@ -457,7 +622,7 @@ function handleFiles(files){
 }
 function renderFileList(){const el=document.getElementById('file-list');if(!el)return;el.innerHTML=attachedFiles.map((f,i)=>`<div class="file-item"><span>📎 ${esc(f.name)}</span><button class="file-remove" onclick="removeFile(${i})">✕</button></div>`).join('');}
 function removeFile(i){attachedFiles.splice(i,1);attachedFileObjects.splice(i,1);renderFileList();}
-function clearSubmitForm(){['f-job','f-wo','f-fab','f-addr','f-contact','f-weight','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const fd=document.getElementById('f-date');if(fd)fd.value=today();const ft=document.getElementById('f-type');if(ft)ft.value='';attachedFiles=[];attachedFileObjects=[];renderFileList();}
+function clearSubmitForm(){['f-job','f-wo','f-fab','f-addr','f-contact','f-weight','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const fd=document.getElementById('f-date');if(fd)fd.value=today();const ft=document.getElementById('f-type');if(ft)ft.value='';const fu=document.getElementById('f-urgent');if(fu)fu.checked=false;attachedFiles=[];attachedFileObjects=[];renderFileList();}
 
 async function submitRequest(){
   let dept=document.getElementById('f-dept').value;
@@ -466,51 +631,84 @@ async function submitRequest(){
   const job=document.getElementById('f-job').value.trim();
   if(!dept){toast('Please select a department.','err');return;}
   if(!date){toast('Please select a delivery date.','err');return;}
+  if(date<today()&&!confirm(`The delivery date you selected (${fmtDate(date)}) is in the past. Are you sure you want to submit this request?`))return;
   if(!job){toast('Please enter a job name.','err');return;}
-  const btn=document.querySelector('#main-content .btn-primary');
+  const delivType=document.getElementById('f-type').value;
+  if(!delivType){toast('Please select a Delivery Type.','err');return;}
+  const btn=document.getElementById('submit-request-btn');
+  if(isSubmitting){return;}
+  isSubmitting=true;
   if(btn){btn.disabled=true;btn.textContent='Submitting…';}
   // First create the record to get an ID
-  const tempBody={dept,delivery_date:date,job_name:job,wo_number:document.getElementById('f-wo').value.trim(),fab_pro:document.getElementById('f-fab').value.trim(),delivery_type:document.getElementById('f-type').value,address:document.getElementById('f-addr').value.trim(),site_contact:document.getElementById('f-contact').value.trim(),weight_notes:document.getElementById('f-weight').value.trim(),special_notes:document.getElementById('f-notes').value.trim(),attachments:[],status:'Pending',submitted_by:user.name};
+  const tempBody={dept,delivery_date:date,job_name:job,wo_number:document.getElementById('f-wo').value.trim(),fab_pro:document.getElementById('f-fab').value.trim(),delivery_type:delivType,address:document.getElementById('f-addr').value.trim(),site_contact:document.getElementById('f-contact').value.trim(),weight_notes:document.getElementById('f-weight').value.trim(),special_notes:document.getElementById('f-notes').value.trim(),urgent:document.getElementById('f-urgent')?.checked||false,attachments:[],status:'Pending',submitted_by:user.name};
   try{
     const result=await post('delivery_requests',tempBody);
     const newId=result[0]?.id||result?.id;
-    // Upload files if any
     let uploadedFiles=[];
     if(attachedFileObjects.length&&newId){
       if(btn)btn.textContent='Uploading files…';
       uploadedFiles=await uploadFiles(attachedFileObjects,newId);
-      if(uploadedFiles.length){await patch('delivery_requests',{attachments:uploadedFiles},`?id=eq.${newId}`);}
+      if(uploadedFiles.length){
+        // Retry up to 3 times if DB patch fails after successful upload
+        let patched=false;
+        for(let i=0;i<3;i++){
+          try{await patch('delivery_requests',{attachments:uploadedFiles},`?id=eq.${newId}`);patched=true;break;}
+          catch(e){if(i===2)toast('Files uploaded but could not link to record — contact David.','err');}
+        }
+      }
     }
     toast('Request submitted!','ok');clearSubmitForm();if(user.role==='dept')showTab('my-requests');
   }catch(e){toast('Error submitting. Try again.','err');}
-  finally{if(btn){btn.disabled=false;btn.textContent='Submit Request';}}
+  finally{isSubmitting=false;if(btn){btn.disabled=false;btn.textContent='Submit Request';}}
 }
 
 async function renderMyRequests(){
   let rows;
   try{rows=await get('delivery_requests',`?dept=eq.${encodeURIComponent(user.dept)}&order=delivery_date.asc`);}
-  catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger)">Error loading requests.</p></div>';return;}
+  catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger)">Error loading requests. Check your connection.</p></div>';return;}
+  const openCount=rows.filter(r=>!['Delivered','Cancelled'].includes(r.status)).length;
+  // Update tab badge
+  const tab=document.getElementById('tab-my-requests');
+  if(tab)tab.textContent=`My Requests${openCount>0?` (${openCount})`:''}`;
   document.getElementById('main-content').innerHTML=`
   <div class="card"><div class="card-title">My Department Requests — ${esc(user.dept)}</div>
   <div class="board-toolbar"><span class="filter-lbl">Status:</span>
     <select onchange="filterMyRequests(this.value,'${user.dept}')">
       <option value="">All</option><option>Pending</option><option>Scheduled</option><option>Delivered</option><option>Cancelled</option>
     </select>
+    <span class="filter-lbl" style="margin-left:auto;color:var(--muted);font-size:11px;">Auto-refreshes every 60s</span>
   </div>${tableHtml(rows,false)}</div>`;
+  startAutoRefresh(renderMyRequests);
 }
 
 async function filterMyRequests(status,dept){
+  try{
+  stopAutoRefresh();
   let params=`?dept=eq.${encodeURIComponent(dept)}&order=delivery_date.asc`;
   if(status)params+=`&status=eq.${status}`;
   const rows=await get('delivery_requests',params);
   const card=document.querySelector('#main-content .card');
-  if(card)card.innerHTML=`<div class="card-title">My Department Requests — ${dept}</div><div class="board-toolbar"><span class="filter-lbl">Status:</span><select onchange="filterMyRequests(this.value,'${dept}')"><option value="">All</option><option>Pending</option><option>Scheduled</option><option>Delivered</option><option>Cancelled</option></select></div>${tableHtml(rows,false)}`;
+  if(card)card.innerHTML=`<div class="card-title">My Department Requests — ${esc(dept)}</div>
+    <div class="board-toolbar"><span class="filter-lbl">Status:</span>
+    <select onchange="filterMyRequests(this.value,'${esc(dept)}')">
+      <option value="" ${!status?'selected':''}>All</option>
+      <option ${status==='Pending'?'selected':''}>Pending</option>
+      <option ${status==='Scheduled'?'selected':''}>Scheduled</option>
+      <option ${status==='Delivered'?'selected':''}>Delivered</option>
+      <option ${status==='Cancelled'?'selected':''}>Cancelled</option>
+    </select>
+    <span class="filter-lbl" style="margin-left:auto;color:var(--muted);font-size:11px;">Auto-refreshes every 60s</span>
+    </div>${tableHtml(rows,false)}`;
+  // Restart auto-refresh keeping the same filter
+  startAutoRefresh(()=>filterMyRequests(status,dept));
+  }catch(e){document.getElementById('main-content').innerHTML='<p style="color:var(--danger);">Error: Error filtering requests. Try again.</p>';}
 }
 
 async function renderBoard(){
+  if(!user||!['dispatcher','admin'].includes(user.role)){toast('Access denied.','err');return;}
   let rows;
-  try{rows=await get('delivery_requests','?order=delivery_date.asc');}
-  catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger)">Error loading board.</p></div>';return;}
+  try{rows=await get('delivery_requests','?order=urgent.desc,delivery_date.asc');}
+  catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger)">Error loading board. Check your connection.</p></div>';return;}
   const pending=rows.filter(r=>r.status==='Pending').length;
   const scheduled=rows.filter(r=>r.status==='Scheduled').length;
   const overdue=rows.filter(r=>isOverdue(r)).length;
@@ -522,7 +720,9 @@ async function renderBoard(){
     <div class="sum-card overdue"><div class="sum-num">${overdue}</div><div class="sum-lbl">Overdue</div></div>
     <div class="sum-card delivered"><div class="sum-num">${delivered}</div><div class="sum-lbl">Delivered</div></div>
   </div>
-  <div class="card"><div class="card-title">Dispatch Board</div>
+  <div class="card"><div class="card-title">Dispatch Board
+    <button class="btn btn-primary btn-sm" style="float:right;font-size:13px;" onclick="openPhoneInModal()">📞 Phone-In / Walk-In Request</button>
+  </div>
   <div class="board-toolbar">
     <span class="filter-lbl">Date:</span><input type="date" id="bd-date" onchange="applyBoardFilter()">
     <span class="filter-lbl">Status:</span>
@@ -531,15 +731,24 @@ async function renderBoard(){
     <select id="bd-driver" onchange="applyBoardFilter()"><option value="">All Drivers</option><option>Bob Johnson</option><option>Brandon Jones</option><option>Michael Gropp</option><option>Ron Gibson</option><option>Ray Swimm</option><option>Shop / Other</option></select>
     <button class="btn btn-secondary btn-sm" onclick="renderBoard()">Clear</button>
     <button class="btn btn-primary btn-sm" onclick="showTab('runsheet')">🖨 Run Sheet</button>
+    <span class="filter-lbl" style="margin-left:auto;color:var(--muted);font-size:11px;">Auto-refreshes every 60s</span>
   </div>
   <div class="table-wrap" id="board-table">${boardTableHtml(rows)}</div></div>`;
+  startAutoRefresh(()=>{
+    // Refresh board but preserve active filters
+    const date=document.getElementById('bd-date')?.value;
+    const status=document.getElementById('bd-status')?.value;
+    const driver=document.getElementById('bd-driver')?.value;
+    if(date||status||driver) applyBoardFilter();
+    else renderBoard();
+  });
 }
 
 function applyBoardFilter(){
   const date=document.getElementById('bd-date').value;
   const status=document.getElementById('bd-status').value;
   const driver=document.getElementById('bd-driver').value;
-  let params='?order=delivery_date.asc';
+  let params='?order=urgent.desc,delivery_date.asc';
   if(date)params+=`&delivery_date=eq.${date}`;
   if(status&&status!=='Overdue')params+=`&status=eq.${status}`;
   if(driver)params+=`&driver=eq.${encodeURIComponent(driver)}`;
@@ -552,8 +761,9 @@ function applyBoardFilter(){
 
 function boardTableHtml(rows){
   if(!rows.length)return'<p style="color:var(--muted);padding:20px 0;">No deliveries match the current filters.</p>';
-  return`<table><thead><tr><th>Date</th><th>Dept</th><th>Job</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Address</th><th>Contact</th><th>Weight</th><th>Status</th><th>Driver</th><th>Truck</th><th>Trailer</th><th>Time</th><th></th></tr></thead>
+  return`<table><thead><tr><th></th><th>Date</th><th>Dept</th><th>Job</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Address</th><th>Contact</th><th>Weight</th><th>Status</th><th>Driver</th><th>Truck</th><th>Trailer</th><th>Time</th><th>By</th><th></th></tr></thead>
   <tbody>${rows.map(r=>`<tr class="${isOverdue(r)?'overdue-row':''}">
+    <td style="text-align:center;">${r.urgent?'🔴':''}</td>
     <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td>
     <td class="td-muted">${esc(r.dept)}</td><td class="td-job">${esc(r.job_name)}</td>
     <td class="td-muted">${esc(r.wo_number)||'—'}</td><td class="td-muted">${esc(r.fab_pro)||'—'}</td>
@@ -564,31 +774,42 @@ function boardTableHtml(rows){
     <td>${r.truck?esc(r.truck):'<span class="td-muted">—</span>'}</td>
     <td>${r.trailer?esc(r.trailer):'<span class="td-muted">—</span>'}</td>
     <td>${r.confirmed_time?fmtTime(r.confirmed_time):'<span class="td-muted">TBD</span>'}</td>
-    <td style="white-space:nowrap;"><button class="btn btn-primary btn-sm" onclick="openAssign('${r.id}')">Assign</button> <button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button></td>
+    <td class="td-muted" style="font-size:11px;">${esc(r.submitted_by)||'—'}</td>
+    <td style="white-space:nowrap;">
+      ${!['Delivered','Cancelled'].includes(r.status)?`<button class="btn btn-primary btn-sm" onclick="openAssign('${r.id}')">Assign</button> `:''}
+      <button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button>
+      ${r.status==='Scheduled'?`<button class="btn btn-sm" style="background:#dcfce7;color:#15803d;border:1px solid #86efac;margin-left:4px;" onclick="quickDeliver('${r.id}')">✓ Delivered</button>`:''}
+    </td>
   </tr>`).join('')}</tbody></table>`;
 }
 
 async function renderRunSheet(){
+  try{
   document.getElementById('main-content').innerHTML=`
   <div class="card"><div class="card-title">Daily Run Sheet</div>
   <div class="board-toolbar">
-    <span class="filter-lbl">Date:</span><input type="date" id="rs-date" value="${today()}" onchange="loadRunSheet()">
+    <span class="filter-lbl">Date:</span><input type="date" id="rs-date" value="${smartRunSheetDate()}" onchange="loadRunSheet()">
     <span class="filter-lbl">Driver:</span>
     <select id="rs-driver" onchange="loadRunSheet()"><option value="">All Drivers</option><option>Bob Johnson</option><option>Brandon Jones</option><option>Michael Gropp</option><option>Ron Gibson</option><option>Ray Swimm</option><option>Shop / Other</option></select>
     <button class="btn btn-primary btn-sm" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-secondary btn-sm" onclick="copyRunSheet()">📋 Copy to Clipboard</button>
   </div>
   <div id="rs-content"><div class="loading"><span class="spinner"></span> Loading...</div></div></div>`;
   loadRunSheet();
+  }catch(e){toast('Error loading run sheet.','err');}
 }
 
 async function loadRunSheet(){
   const date=document.getElementById('rs-date').value;
   const driver=document.getElementById('rs-driver').value;
+  const el=document.getElementById('rs-content');
+  if(!el)return;
+  el.innerHTML='<div class="loading"><span class="spinner"></span> Loading...</div>';
+  try{
   let params=`?delivery_date=eq.${date}&status=neq.Cancelled&order=confirmed_time.asc.nullslast`;
   if(driver)params+=`&driver=eq.${encodeURIComponent(driver)}`;
   const rows=await get('delivery_requests',params);
   const byDriver={};rows.forEach(r=>{const d=r.driver||'Unassigned';if(!byDriver[d])byDriver[d]=[];byDriver[d].push(r);});
-  const el=document.getElementById('rs-content');
   if(!rows.length){el.innerHTML='<p style="color:var(--muted);padding:20px 0;">No deliveries scheduled for this date.</p>';return;}
   el.innerHTML=Object.entries(byDriver).map(([driverName,runs])=>`
     <div style="margin-bottom:32px;">
@@ -600,17 +821,19 @@ async function loadRunSheet(){
       <tbody>${runs.map((r,i)=>`<tr>
         <td style="font-weight:700;color:var(--yellow-dark);">${i+1}</td>
         <td style="font-weight:700;white-space:nowrap;">${r.confirmed_time?fmtTime(r.confirmed_time):'TBD'}</td>
-        <td class="td-job">${esc(r.job_name)}</td>
+        <td class="td-job">${r.urgent?'🔴 ':''}<strong style="${r.urgent?'color:#b91c1c;':''}">${esc(r.job_name)}</strong></td>
         <td class="td-muted">${[r.wo_number,r.fab_pro].filter(Boolean).map(esc).join(' / ')||'—'}</td>
         <td>${esc(r.delivery_type)||'—'}</td>
         <td style="font-size:12px;">${esc(r.address)||'—'}</td>
         <td>${esc(r.site_contact)||'—'}</td><td>${esc(r.weight_notes)||'—'}</td>
         <td style="font-size:12px;">${[r.special_notes,r.dispatcher_notes].filter(Boolean).map(esc).join(' | ')||'—'}</td>
-        <td>${r.attachments&&r.attachments.length?r.attachments.map(a=>a.url?`<a href="${esc(a.url)}" target="_blank" style="display:block;color:var(--accent);text-decoration:none;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join(''):'—'}</td>
+        <td>${r.attachments&&r.attachments.length?r.attachments.map(a=>safeUrl(a.url)?`<a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener noreferrer" style="display:block;color:var(--accent);text-decoration:none;margin-bottom:3px;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join(''):'—'}</td>
       </tr>`).join('')}</tbody></table></div></div>`).join('');
+  }catch(e){el.innerHTML='<p style="color:var(--danger);padding:20px 0;">Error loading run sheet. Check your connection.</p>';}
 }
 
 async function openAssign(id){
+  try{
   editingId=id;
   const rows=await get('delivery_requests',`?id=eq.${id}`);
   const r=rows[0];if(!r)return;
@@ -624,7 +847,7 @@ async function openAssign(id){
     <div class="det-row"><span class="det-lbl">Contact</span><span class="det-val">${esc(r.site_contact)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Weight</span><span class="det-val">${esc(r.weight_notes)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Dept Notes</span><span class="det-val">${esc(r.special_notes)||'—'}</span></div>
-    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>a.url?`<a href="${esc(a.url)}" target="_blank" style="display:block;color:var(--accent);text-decoration:none;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join('')}</span></div>`:''}`;
+    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>safeUrl(a.url)?`<a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener noreferrer" style="display:block;color:var(--accent);text-decoration:none;margin-bottom:3px;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join('')}</span></div>`:''}`;
   document.getElementById('m-driver').value=r.driver||'';
   document.getElementById('m-truck').value=r.truck||'';
   document.getElementById('m-trailer').value=r.trailer||'';
@@ -634,8 +857,10 @@ async function openAssign(id){
   document.getElementById('m-date').value=r.delivery_date||'';
   driverOther();
   assignFileObjects=[];
+  assignOpenedAt=new Date().toISOString();
   const afl=document.getElementById('assign-file-list');if(afl)afl.innerHTML='';
   document.getElementById('assign-modal').classList.add('open');
+  }catch(e){toast('Error opening assignment. Try again.','err');}
 }
 
 // ─── DISPATCHER FILE HANDLING ──────────────────────────────────────
@@ -652,7 +877,7 @@ function removeAssignFile(i){assignFileObjects.splice(i,1);renderAssignFileList(
 
 async function saveAssign(){
   let driver=document.getElementById('m-driver').value;
-  if(driver==='Shop / Other'){const o=document.getElementById('m-driver-other').value.trim();if(o)driver=o;}
+  if(driver==='Shop / Other'){const o=document.getElementById('m-driver-other').value.trim();if(o){driver=o;}else{driver='';}}
   const status=document.getElementById('m-status').value;
   const delivDate=document.getElementById('m-date').value;
   if(status==='Scheduled'&&!driver){toast('Please assign a driver before marking Scheduled.','err');return;}
@@ -660,10 +885,13 @@ async function saveAssign(){
   const btn=document.getElementById('assign-save-btn');
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{
-    // Get existing attachments so we don't wipe them
-    const existing=await get('delivery_requests',`?id=eq.${editingId}`);
-    const existingAttachments=(existing[0]?.attachments)||[];
-    // Upload any new files
+    // Race condition check — verify record hasn't been updated by another dispatcher
+    const fresh=await get('delivery_requests',`?id=eq.${editingId}`);
+    if(!fresh[0]){toast('Record not found — it may have been deleted.','err');return;}
+    if(assignOpenedAt&&fresh[0].updated_at&&new Date(fresh[0].updated_at)>new Date(assignOpenedAt)){
+      if(!confirm('⚠️ This record was updated by someone else while you had it open. Do you still want to save and overwrite their changes?'))return;
+    }
+    const existingAttachments=(fresh[0]?.attachments)||[];
     let newAttachments=[];
     if(assignFileObjects.length){
       if(btn)btn.textContent='Uploading…';
@@ -674,15 +902,17 @@ async function saveAssign(){
     await patch('delivery_requests',body,`?id=eq.${editingId}`);
     assignFileObjects=[];
     closeModal('assign-modal');toast('Assignment saved!','ok');renderBoard();
-  }catch(e){toast('Error saving. Try again.','err');}
+  }catch(e){toast(e.message==='Network error'?'Network error — check your connection and try again.':'Error saving. Try again.','err');}
   finally{if(btn){btn.disabled=false;btn.textContent='Save';}}
 }
 
 async function viewRequest(id){
+  try{
   viewingId=id;
   const rows=await get('delivery_requests',`?id=eq.${id}`);
   const r=rows[0];if(!r)return;
   document.getElementById('view-modal-body').innerHTML=`
+    ${r.urgent?`<div style="background:#fff5f5;border:1px solid #fca5a5;border-radius:6px;padding:8px 14px;margin-bottom:14px;font-weight:700;color:#b91c1c;font-size:14px;">🔴 URGENT — This job has been flagged as urgent</div>`:''}
     <div class="det-row"><span class="det-lbl">Status</span><span class="det-val">${badgeHtml(r)}</span></div>
     <div class="det-row"><span class="det-lbl">Department</span><span class="det-val">${esc(r.dept)}</span></div>
     <div class="det-row"><span class="det-lbl">Job Name</span><span class="det-val" style="font-weight:700;">${esc(r.job_name)}</span></div>
@@ -694,14 +924,17 @@ async function viewRequest(id){
     <div class="det-row"><span class="det-lbl">Site Contact</span><span class="det-val">${esc(r.site_contact)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Weight / Load</span><span class="det-val">${esc(r.weight_notes)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Notes</span><span class="det-val">${esc(r.special_notes)||'—'}</span></div>
-    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>a.url?`<a href="${esc(a.url)}" target="_blank" style="display:block;color:var(--accent);text-decoration:none;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join('')}</span></div>`:''}
+    ${r.attachments&&r.attachments.length?`<div class="det-row"><span class="det-lbl">Attachments</span><span class="det-val">${r.attachments.map(a=>safeUrl(a.url)?`<a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener noreferrer" style="display:block;color:var(--accent);text-decoration:none;margin-bottom:3px;">📎 ${esc(a.name)}</a>`:`📎 ${esc(a.name)}`).join('')}</span></div>`:''}
     <hr style="margin:16px 0;border:none;border-top:1px solid var(--silver);">
     <div class="det-row"><span class="det-lbl">Driver</span><span class="det-val">${esc(r.driver)||'Unassigned'}</span></div>
     <div class="det-row"><span class="det-lbl">Truck #</span><span class="det-val">${esc(r.truck)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Trailer #</span><span class="det-val">${esc(r.trailer)||'—'}</span></div>
     <div class="det-row"><span class="det-lbl">Confirmed Time</span><span class="det-val">${r.confirmed_time?fmtTime(r.confirmed_time):'TBD'}</span></div>
     ${(user.role==='dispatcher'||user.role==='admin')&&r.dispatcher_notes?`<div class="det-row"><span class="det-lbl">Dispatcher Notes</span><span class="det-val">${esc(r.dispatcher_notes)}</span></div>`:''}
-    <div class="det-row"><span class="det-lbl">Submitted</span><span class="det-val">${new Date(r.submitted_at).toLocaleString()}</span></div>`;
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--silver);">
+    <div class="det-row"><span class="det-lbl">Submitted By</span><span class="det-val">${esc(r.submitted_by)||'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Submitted</span><span class="det-val">${r.submitted_at?new Date(r.submitted_at).toLocaleString():'—'}</span></div>
+    <div class="det-row"><span class="det-lbl">Last Updated</span><span class="det-val">${r.updated_at?new Date(r.updated_at).toLocaleString():'—'}</span></div>`;
   const eb=document.getElementById('view-edit-btn');
   eb.style.display=(r.status==='Pending'&&user.role==='dept')?'inline-block':'none';
   const fu=document.getElementById('field-upload-section');
@@ -709,10 +942,12 @@ async function viewRequest(id){
   fieldFileObjects=[];
   const ffl=document.getElementById('field-file-list');if(ffl)ffl.innerHTML='';
   document.getElementById('view-modal').classList.add('open');
+  }catch(e){toast('Error loading request details.','err');}
 }
 
 function editFromView(){closeModal('view-modal');openEditModal(viewingId);}
 async function openEditModal(id){
+  try{
   editingId=id;
   const rows=await get('delivery_requests',`?id=eq.${id}`);
   const r=rows[0];if(!r)return;
@@ -726,6 +961,7 @@ async function openEditModal(id){
   document.getElementById('e-weight').value=r.weight_notes;
   document.getElementById('e-notes').value=r.special_notes;
   document.getElementById('edit-modal').classList.add('open');
+  }catch(e){toast('Error loading edit form.','err');}
 }
 async function saveEdit(){
   const job=document.getElementById('e-job').value.trim();
@@ -774,17 +1010,29 @@ async function saveFieldAttachments(){
 }
 
 // ─── FIELD / PM VIEW ───────────────────────────────────────────────
-async function renderFieldJobs(){
+async function renderFieldJobs(deptFilter=''){
   const main=document.getElementById('main-content');
   main.innerHTML='<div class="loading"><span class="spinner"></span> Loading...</div>';
-  const rows=await get('delivery_requests','?status=eq.Scheduled&order=delivery_date.asc');
-  if(!rows.length){
-    main.innerHTML='<div class="card"><div class="card-title">📋 Scheduled Jobs</div><p style="color:var(--muted);">No scheduled jobs right now.</p></div>';
-    return;
-  }
+  try{
+  let params='?status=eq.Scheduled&order=delivery_date.asc';
+  if(deptFilter)params+=`&dept=eq.${encodeURIComponent(deptFilter)}`;
+  const rows=await get('delivery_requests',params);
+  // Get unique depts for filter dropdown
+  const allRows=await get('delivery_requests','?status=eq.Scheduled&order=dept.asc');
+  const depts=[...new Set(allRows.map(r=>r.dept))].sort();
   main.innerHTML=`<div class="card">
-    <div class="card-title">📋 Scheduled Jobs — ${rows.length} job${rows.length!==1?'s':''}</div>
-    <div class="table-wrap"><table>
+    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:0;">📋 Scheduled Jobs — ${rows.length} job${rows.length!==1?'s':''}</div>
+      <div class="board-toolbar" style="margin-bottom:0;">
+        <span class="filter-lbl">Dept:</span>
+        <select onchange="renderFieldJobs(this.value)" style="padding:6px 10px;background:var(--silver);border:1px solid var(--silver-mid);border-radius:6px;color:var(--text);font-size:13px;">
+          <option value="">All Departments</option>
+          ${depts.map(d=>`<option value="${esc(d)}" ${d===deptFilter?'selected':''}>${esc(d)}</option>`).join('')}
+        </select>
+        <span class="filter-lbl" style="color:var(--muted);font-size:11px;">Auto-refreshes every 60s</span>
+      </div>
+    </div>
+    ${rows.length?`<div class="table-wrap"><table>
       <thead><tr><th>Date</th><th>Dept</th><th>Job Name</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Address</th><th>Contact</th><th>Driver</th><th>Time</th><th>📎</th><th></th></tr></thead>
       <tbody>${rows.map(r=>`<tr>
         <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td>
@@ -800,9 +1048,10 @@ async function renderFieldJobs(){
         <td>${r.attachments&&r.attachments.length?`<span style="color:var(--accent);">📎 ${r.attachments.length}</span>`:'—'}</td>
         <td><button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button></td>
       </tr>`).join('')}
-      </tbody>
-    </table></div>
+      </tbody></table></div>`:'<p style="color:var(--muted);padding:20px 0;">No scheduled jobs'+(deptFilter?' for '+esc(deptFilter):'')+' right now.</p>'}
   </div>`;
+  startAutoRefresh(()=>renderFieldJobs(deptFilter));
+  }catch(e){main.innerHTML='<div class="card"><p style="color:var(--danger);">Error loading scheduled jobs. Check your connection.</p></div>';}
 }
 
 async function renderSearch(){
@@ -810,18 +1059,20 @@ async function renderSearch(){
   main.innerHTML=`<div class="card">
     <div class="card-title">🔍 Search Requests</div>
     <div class="board-toolbar" style="flex-wrap:wrap;gap:10px;">
-      <input type="text" id="sr-text" placeholder="Job name, WO#, Fab Pro, PM…" style="flex:1;min-width:200px;padding:8px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;">
+      <input type="text" id="sr-text" placeholder="Job name, WO#, Fab Pro, PM…" onkeydown="if(event.key==='Enter')runSearch()" style="flex:1;min-width:200px;padding:8px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;">
       <input type="date" id="sr-date" style="padding:8px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;">
       <select id="sr-status" style="padding:8px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;">
         <option value="">All Statuses</option>
         <option>Pending</option><option>Scheduled</option><option>Delivered</option><option>Cancelled</option>
       </select>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#b91c1c;font-weight:600;white-space:nowrap;">
+        <input type="checkbox" id="sr-urgent" style="accent-color:#b91c1c;"> 🔴 Urgent only
+      </label>
       <button class="btn btn-primary btn-sm" onclick="runSearch()">Search</button>
       <button class="btn btn-secondary btn-sm" onclick="runSearch(true)">Clear</button>
     </div>
     <div id="search-results" style="margin-top:16px;"><p style="color:var(--muted);">Enter a search term or date and click Search.</p></div>
   </div>`;
-  document.getElementById('sr-text').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch();});
 }
 
 async function runSearch(clear=false){
@@ -835,7 +1086,10 @@ async function runSearch(clear=false){
   const text=document.getElementById('sr-text').value.trim().toLowerCase();
   const date=document.getElementById('sr-date').value;
   const status=document.getElementById('sr-status').value;
+  const urgentOnly=document.getElementById('sr-urgent')?.checked||false;
   const el=document.getElementById('search-results');
+  el.innerHTML='<div class="loading"><span class="spinner"></span> Searching...</div>';
+  try{
   el.innerHTML='<p style="color:var(--muted);">Searching…</p>';
 
   // Dept users only see their own dept; field sees all scheduled; dispatcher/admin see all
@@ -852,13 +1106,18 @@ async function runSearch(clear=false){
     rows=rows.filter(r=>[r.job_name,r.wo_number,r.fab_pro,r.site_contact,r.special_notes,r.address,r.dept,r.submitted_by]
       .filter(Boolean).some(v=>v.toLowerCase().includes(text)));
   }
+  if(urgentOnly)rows=rows.filter(r=>r.urgent);
 
   if(!rows.length){el.innerHTML='<p style="color:var(--muted);">No results found.</p>';return;}
 
-  el.innerHTML=`<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${rows.length} result${rows.length!==1?'s':''} found</p>
+  const LIMIT=200;
+  const capped=rows.slice(0,LIMIT);
+  const overLimit=rows.length>LIMIT;
+
+  el.innerHTML=`<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${rows.length} result${rows.length!==1?'s':''} found${overLimit?` — showing first ${LIMIT}. Narrow your search for more specific results.`:''}</p>
   <div class="table-wrap"><table>
     <thead><tr><th>Date</th><th>Dept</th><th>Job Name</th><th>WO #</th><th>Fab Pro</th><th>Type</th><th>Status</th><th>Driver</th><th>📎</th><th></th></tr></thead>
-    <tbody>${rows.map(r=>`<tr class="${isOverdue(r)?'overdue-row':''}">
+    <tbody>${capped.map(r=>`<tr class="${isOverdue(r)?'overdue-row':''}">
       <td style="white-space:nowrap;">${fmtDate(r.delivery_date)}</td>
       <td class="td-muted">${esc(r.dept)}</td>
       <td class="td-job">${esc(r.job_name)}</td>
@@ -872,30 +1131,52 @@ async function runSearch(clear=false){
     </tr>`).join('')}
     </tbody>
   </table></div>`;
+  }catch(e){el.innerHTML='<p style="color:var(--danger);">Error searching. Check your connection and try again.</p>';}
 }
 
 // ─── FILE UPLOAD TO SUPABASE STORAGE ───────────────────────────────
+function safeUrl(url){
+  if(!url)return null;
+  try{
+    const u=new URL(url);
+    if(!['https:','http:'].includes(u.protocol))return null;
+    return url;
+  }catch(e){return null;}
+}
+
 async function uploadFiles(files, requestId){
+  if(!navigator.onLine){showOfflineBanner();throw new Error('No connection');}
+  const MAX_SIZE=50*1024*1024; // 50MB
   const uploaded=[];
   for(const file of files){
-    const ext=file.name.split('.').pop();
+    if(file.size>MAX_SIZE){
+      toast(`${esc(file.name)} is too large (max 50MB). Skipped.`,'err');
+      continue;
+    }
     const path=`${requestId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-    const res=await fetch(`${SB_URL}/storage/v1/object/${encodeURIComponent(BUCKET)}/${path}`,{
-      method:'POST',
-      headers:{'apikey':SB_SERVICE,'Authorization':'Bearer '+SB_SERVICE,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},
-      body:file
-    });
-    if(res.ok){
-      const publicUrl=`${SB_URL}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/${path}`;
-      uploaded.push({name:file.name,url:publicUrl,size:file.size});
-    }else{
-      toast(`Failed to upload ${esc(file.name)}`,'err');
+    try{
+      const res=await fetch(`${SB_URL}/storage/v1/object/${encodeURIComponent(BUCKET)}/${path}`,{
+        method:'POST',
+        headers:{'apikey':SB_SERVICE,'Authorization':'Bearer '+SB_SERVICE,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},
+        body:file
+      });
+      if(res.ok){
+        const publicUrl=`${SB_URL}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/${path}`;
+        uploaded.push({name:file.name,url:publicUrl,size:file.size});
+      }else{
+        const errText=await res.text();
+        toast(`Failed to upload ${esc(file.name)} — ${errText.slice(0,60)}`,'err');
+      }
+    }catch(e){
+      toast(`Upload error for ${esc(file.name)} — check connection`,'err');
     }
   }
   return uploaded;
 }
 
 async function renderReports(){
+  if(!user||user.role!=='admin'){toast('Access denied.','err');return;}
+  try{
   document.getElementById('main-content').innerHTML=`
   <div class="card"><div class="card-title">Reports</div>
   <div class="board-toolbar">
@@ -920,6 +1201,7 @@ async function renderReports(){
   const from=new Date();from.setDate(from.getDate()-30);
   document.getElementById('rp-from').value=from.toISOString().split('T')[0];
   loadReports();
+  }catch(e){document.getElementById('main-content').innerHTML='<div class="card"><p style="color:var(--danger);">Error loading reports.</p></div>';}
 }
 
 let reportData=[];
@@ -929,9 +1211,11 @@ async function loadReports(){
   const type=document.getElementById('rp-type')?document.getElementById('rp-type').value:'summary';
   if(!from||!to){toast('Set both dates.','err');return;}
   if(from>to){toast('Start date must be before end date.','err');return;}
+  const el=document.getElementById('rp-content');
+  if(el)el.innerHTML='<div class="loading"><span class="spinner"></span> Running report...</div>';
+  try{
   reportData=await get('delivery_requests',`?delivery_date=gte.${from}&delivery_date=lte.${to}&order=delivery_date.asc`);
   const rows=reportData;
-  const el=document.getElementById('rp-content');
 
   // Always show summary stats at top
   const total=rows.length;
@@ -939,12 +1223,14 @@ async function loadReports(){
   const pending=rows.filter(r=>r.status==='Pending').length;
   const cancelled=rows.filter(r=>r.status==='Cancelled').length;
   const overdue=rows.filter(r=>isOverdue(r)).length;
-  const statsHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;">
+  const urgent=rows.filter(r=>r.urgent).length;
+  const statsHtml=`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px;">
     <div class="report-stat"><div class="report-stat-num">${total}</div><div class="report-stat-lbl">Total</div></div>
     <div class="report-stat"><div class="report-stat-num" style="color:var(--green)">${delivered}</div><div class="report-stat-lbl">Delivered</div></div>
     <div class="report-stat"><div class="report-stat-num" style="color:var(--amber)">${pending}</div><div class="report-stat-lbl">Pending</div></div>
     <div class="report-stat"><div class="report-stat-num" style="color:var(--danger)">${overdue}</div><div class="report-stat-lbl">Overdue</div></div>
     <div class="report-stat"><div class="report-stat-num" style="color:var(--muted)">${cancelled}</div><div class="report-stat-lbl">Cancelled</div></div>
+    <div class="report-stat"><div class="report-stat-num" style="color:#b91c1c;">${urgent}</div><div class="report-stat-lbl">🔴 Urgent</div></div>
   </div>`;
 
   if(type==='summary'){
@@ -1039,6 +1325,7 @@ async function loadReports(){
   } else {
     el.innerHTML=statsHtml+`<div class="card-title" style="font-size:14px;margin-bottom:12px;">All Deliveries</div><div class="table-wrap">${tableHtml(rows,false)}</div>`;
   }
+  }catch(e){if(el)el.innerHTML='<p style="color:var(--danger);">Error loading report. Check your connection.</p>';}
 }
 
 function getWeek(dateStr){
@@ -1050,13 +1337,16 @@ function getWeek(dateStr){
 
 function exportCSV(){
   if(!reportData.length){toast('Run a report first.','err');return;}
-  const cols=['delivery_date','dept','job_name','wo_number','fab_pro','delivery_type','address','site_contact','weight_notes','status','driver','truck','trailer','confirmed_time','special_notes','dispatcher_notes','submitted_by','submitted_at'];
+  const cols=['delivery_date','dept','job_name','wo_number','fab_pro','delivery_type','address','site_contact','weight_notes','urgent','status','driver','truck','trailer','confirmed_time','special_notes','dispatcher_notes','submitted_by','submitted_at'];
   const sanitize=v=>{const s=(v||'').toString().replace(/"/g,'""');return /^[=+\-@\t\r]/.test(s)?`"'${s}"`:`"${s}"`;};  
   const csv=[cols.join(','),...reportData.map(r=>cols.map(c=>sanitize(r[c])).join(','))].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`tcb_dispatch_report_${today()}.csv`;a.click();
 }
 
 async function renderAdmin(){
+  try{
+  if(!user||user.role!=='admin'){toast('Access denied.','err');return;}
+  document.getElementById('main-content').innerHTML='<div class="loading"><span class="spinner"></span> Loading...</div>';
   const dispatchers=await get('dispatchers','?order=created_at.asc');
   document.getElementById('main-content').innerHTML=`
   <div class="card"><div class="card-title">Dispatcher Accounts</div>
@@ -1069,6 +1359,7 @@ async function renderAdmin(){
       <td>${d.active?'✅':'❌'}</td>
       <td><button class="btn btn-secondary btn-sm" onclick="toggleDispatcher('${d.id}',${d.active})">${d.active?'Deactivate':'Activate'}</button></td>
     </tr>`).join('')}</tbody></table></div></div>`;
+  }catch(e){document.getElementById('main-content').innerHTML='<p style="color:var(--danger);">Error: Error loading admin panel.</p>';}
 }
 
 async function saveDispatcher(){
@@ -1079,8 +1370,16 @@ async function saveDispatcher(){
 }
 
 async function toggleDispatcher(id,active){
-  await patch('dispatchers',{active:!active},`?id=eq.${id}`);
-  toast(active?'Account deactivated.':'Account activated.','ok');renderAdmin();
+  if(active&&!confirm('Deactivate this account? The user will be unable to log in until reactivated.'))return;
+  // Prevent self-lockout
+  const rows=await get('dispatchers',`?id=eq.${id}`);
+  if(rows[0]&&rows[0].username===user.username&&active){
+    toast('You cannot deactivate your own account.','err');return;
+  }
+  try{
+    await patch('dispatchers',{active:!active},`?id=eq.${id}`);
+    toast(active?'Account deactivated.':'Account activated.','ok');renderAdmin();
+  }catch(e){toast('Error updating account.','err');}
 }
 
 function tableHtml(rows,isBoard=false){
@@ -1094,13 +1393,148 @@ function tableHtml(rows,isBoard=false){
     <td>${r.confirmed_time?fmtTime(r.confirmed_time):'<span class="td-muted">TBD</span>'}</td>
     <td style="white-space:nowrap;">
       <button class="btn btn-secondary btn-sm" onclick="viewRequest('${r.id}')">View</button>
-      ${r.status==='Pending'&&user.role==='dept'?`<button class="btn btn-primary btn-sm" onclick="editRequest('${r.id}')">Edit</button>`:''}
+      ${r.status==='Pending'&&user.role==='dept'?`<button class="btn btn-primary btn-sm" onclick="editRequest('${r.id}')">Edit</button><button class="btn btn-sm" style="background:#fff5f5;color:#b91c1c;border:1px solid #fca5a5;" onclick="cancelRequest('${r.id}','${esc(r.job_name)}')">Cancel</button>`:''}
       ${(user.role==='dispatcher'||user.role==='admin')?`<button class="btn btn-primary btn-sm" onclick="openAssign('${r.id}')">Assign</button>`:''}
     </td>
   </tr>`).join('')}</tbody></table></div>`;
 }
 
+async function cancelRequest(id, jobName){
+  if(!confirm(`Cancel the request for "${jobName}"? This cannot be undone.`))return;
+  try{
+    // Verify ownership before cancelling — only cancel if dept matches
+    const rows=await get('delivery_requests',`?id=eq.${id}&status=eq.Pending`);
+    if(!rows.length){toast('Cannot cancel — request may have already been assigned or cancelled.','err');renderMyRequests();return;}
+    if(user.role==='dept'&&rows[0].dept!==user.dept){toast('You can only cancel your own department requests.','err');return;}
+    await patch('delivery_requests',{status:'Cancelled',updated_at:new Date().toISOString()},`?id=eq.${id}`);
+    toast('Request cancelled.','ok');renderMyRequests();
+  }catch(e){toast('Error cancelling request. Try again.','err');}
+}
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+async function quickDeliver(id){
+  if(!confirm('Mark this job as Delivered?'))return;
+  try{
+    await patch('delivery_requests',{status:'Delivered',updated_at:new Date().toISOString()},`?id=eq.${id}`);
+    toast('Marked as Delivered! ✓','ok');
+    // Refresh preserving filters
+    const date=document.getElementById('bd-date')?.value;
+    const status=document.getElementById('bd-status')?.value;
+    const driver=document.getElementById('bd-driver')?.value;
+    if(date||status||driver)applyBoardFilter();else renderBoard();
+  }catch(e){toast('Error updating status.','err');}
+}
+
+// ─── PHONE-IN / WALK-IN REQUEST ────────────────────────────────────
+function openPhoneInModal(){
+  // Reset form
+  ['pi-dept','pi-type','pi-driver'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['pi-job','pi-wo','pi-fab','pi-addr','pi-contact','pi-weight','pi-notes','pi-truck','pi-trailer','pi-driver-other'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('pi-date').value=today();
+  const piUrg=document.getElementById('pi-urgent');if(piUrg)piUrg.checked=false;
+  const oth=document.getElementById('pi-driver-other');if(oth)oth.classList.remove('vis');
+  document.getElementById('pi-time').value='';
+  document.getElementById('phonein-modal').classList.add('open');
+}
+
+function piDriverOther(){
+  const v=document.getElementById('pi-driver').value;
+  const o=document.getElementById('pi-driver-other');
+  v==='Other'?o.classList.add('vis'):o.classList.remove('vis');
+}
+
+async function savePhoneIn(scheduleNow){
+  const dept=document.getElementById('pi-dept').value;
+  const date=document.getElementById('pi-date').value;
+  const job=document.getElementById('pi-job').value.trim();
+  if(!dept){toast('Please select a department.','err');return;}
+  if(!date){toast('Please enter a delivery date.','err');return;}
+  if(!job){toast('Please enter a job name.','err');return;}
+  let driver=document.getElementById('pi-driver').value;
+  if(driver==='Other')driver=document.getElementById('pi-driver-other').value.trim();
+  if(driver==='Other')driver=''; // clear if text box was empty
+  if(scheduleNow&&!driver){toast('Please assign a driver to schedule immediately.','err');return;}
+  const truck=document.getElementById('pi-truck').value.trim();
+  if(scheduleNow&&!truck){toast('Please enter a truck number to schedule immediately.','err');return;}
+  const btnP=document.getElementById('pi-save-pending');
+  const btnS=document.getElementById('pi-save-scheduled');
+  [btnP,btnS].forEach(b=>{if(b){b.disabled=true;}});
+  const status=scheduleNow?'Scheduled':'Pending';
+  const body={
+    dept,delivery_date:date,job_name:job,
+    wo_number:document.getElementById('pi-wo').value.trim(),
+    fab_pro:document.getElementById('pi-fab').value.trim(),
+    delivery_type:document.getElementById('pi-type').value,
+    address:document.getElementById('pi-addr').value.trim(),
+    site_contact:document.getElementById('pi-contact').value.trim(),
+    weight_notes:document.getElementById('pi-weight').value.trim(),
+    special_notes:document.getElementById('pi-notes').value.trim(),
+    driver:driver||null,
+    truck:truck||null,
+    trailer:document.getElementById('pi-trailer').value.trim()||null,
+    urgent:document.getElementById('pi-urgent')?.checked||false,
+    confirmed_time:document.getElementById('pi-time').value||null,
+    attachments:[],status,
+    submitted_by:user.name+' (phone-in)'
+  };
+  try{
+    await post('delivery_requests',body);
+    closeModal('phonein-modal');
+    toast(`Request saved as ${status}!`,'ok');
+    renderBoard();
+  }catch(e){toast('Error saving request. Try again.','err');}
+  finally{[btnP,btnS].forEach(b=>{if(b)b.disabled=false;});}
+}
+function checkDeliveryDate(val){
+  const dw=document.getElementById('date-warning');if(!dw)return;
+  if(!val){dw.style.display='none';return;}
+  if(val<today()){
+    dw.style.display='block';dw.style.background='#fff5f5';dw.style.color='#b91c1c';dw.style.border='1px solid #fca5a5';
+    dw.textContent='⚠️ This date is in the past — please confirm this is correct.';
+  } else {
+    // Check if it's within 24 hours (today or tomorrow)
+    const diffDays=Math.floor((new Date(val)-new Date(today()))/(1000*60*60*24));
+    if(diffDays<=1){
+      dw.style.display='block';dw.style.background='#fffbea';dw.style.color='#92400e';dw.style.border='1px solid #fcd34d';
+      dw.textContent='⚠️ Late notice — same/next day delivery not guaranteed. Contact dispatcher directly.';
+    } else {
+      dw.style.display='none';
+    }
+  }
+}
+
+function copyRunSheet(){
+  const table=document.querySelector('#main-content table');
+  if(!table){toast('No run sheet to copy.','err');return;}
+  let text='TCB DISPATCH — DAILY RUN SHEET\n\n';
+  table.querySelectorAll('tr').forEach(row=>{
+    const cells=Array.from(row.querySelectorAll('th,td')).map(c=>c.textContent.trim()).filter(Boolean);
+    if(cells.length)text+=cells.join(' | ')+'\n';
+  });
+  navigator.clipboard.writeText(text).then(()=>toast('Run sheet copied to clipboard!','ok')).catch(()=>toast('Copy failed — try manually.','err'));
+}
+
+function checkAddressWarning(){
+  const type=document.getElementById('f-type')?.value;
+  const addr=document.getElementById('f-addr')?.value.trim();
+  // Show warning if Deliver or On-Site selected without address
+  if((type==='Deliver'||type==='On-Site')&&!addr){
+    const el=document.getElementById('f-addr');
+    if(el){el.style.borderColor='#f59e0b';el.placeholder='⚠️ Address required for '+type;}
+  } else {
+    const el=document.getElementById('f-addr');
+    if(el){el.style.borderColor='';el.placeholder='Full street address, city, state, zip';}
+  }
+}
+
+function smartRunSheetDate(){
+  // After 3pm, default to tomorrow's date
+  const now=new Date();
+  const d=now.getHours()>=15?new Date(now.getTime()+86400000):now;
+  return d.toISOString().split('T')[0];
+}
+
 function isOverdue(r){return!['Delivered','Cancelled'].includes(r.status)&&r.delivery_date<today();}
 function badgeHtml(r){
   if(isOverdue(r))return'<span class="badge b-overdue">Overdue</span>';
@@ -1110,8 +1544,14 @@ function badgeHtml(r){
 function today(){return new Date().toISOString().split('T')[0];}
 function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${m}/${d}/${y}`;}
 function fmtTime(t){if(!t)return'';const[h,min]=t.split(':');const hr=parseInt(h);const disp=hr===0?12:hr>12?hr-12:hr;return`${disp}:${min} ${hr>=12?'PM':'AM'}`;}
-function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;setTimeout(()=>t.className='toast',3000);}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;const dur=type==='err'?6000:3000;setTimeout(()=>t.className='toast',dur);}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+window.addEventListener('beforeunload',e=>{
+  if(user&&document.getElementById('f-job')&&isFormDirty()){
+    e.preventDefault();e.returnValue='You have an unsaved request.';
+  }
+});
 </script>
 </body>
 </html>
