@@ -179,6 +179,12 @@ tbody td { padding:9px 12px; vertical-align:middle; }
   main { padding:12px; }
   .dept-grid { grid-template-columns:1fr; }
 }
+
+/* ---- Authorship ---- */
+.authorship{text-align:center;font-size:11px;letter-spacing:.5px;color:var(--muted);line-height:1.7;
+  max-width:1400px;margin:32px auto 20px;padding:16px 20px 0;border-top:1px solid var(--silver-mid);}
+.authorship b{color:var(--text);font-weight:600;}
+.login-authorship{border-top:1px solid var(--silver-mid);margin:22px 0 0;padding:14px 0 0;max-width:none;}
 </style>
 </head>
 <body>
@@ -213,6 +219,7 @@ tbody td { padding:9px 12px; vertical-align:middle; }
       <div id="login-err" class="login-err">Invalid username or password.</div>
       <span class="login-back" onclick="showDeptPanel()">← Back</span>
     </div>
+    <div class="authorship login-authorship">Designed and built by <b>David R. Waugh</b><br>&copy; 2026 &nbsp;·&nbsp; All rights reserved</div>
   </div>
 </div>
 
@@ -434,6 +441,8 @@ tbody td { padding:9px 12px; vertical-align:middle; }
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="authorship">Designed and built by <b>David R. Waugh</b> &nbsp;·&nbsp; &copy; 2026 &nbsp;·&nbsp; All rights reserved</div>
 
 <script>
 const SB_URL='https://yelhykgebazlrvdjbwuj.supabase.co';
